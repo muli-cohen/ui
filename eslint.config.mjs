@@ -14,7 +14,8 @@ export default [
     languageOptions: {
       ecmaVersion: 2021,
       globals: {
-        ...globals.browser
+        ...globals.browser,
+        ...globals.jest
       },
       parserOptions: {
         ecmaFeatures: {
