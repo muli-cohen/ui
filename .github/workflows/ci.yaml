@@ -42,6 +42,7 @@ jobs:
       - name: Verifying Formatting
         run: npm run format:check
 
+
       - name: Build
         id: build
         run: npm run build
