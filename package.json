@@ -1,8 +1,37 @@
 {
   "name": "mlrun.ui",
   "version": "1.10.0",
-  "private": true,
   "homepage": "/mlrun",
+  "main": "./dist/mlrun-ui.umd.js",
+  "module": "./dist/mlrun-ui.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/mlrun-ui.es.js",
+      "require": "./dist/mlrun-ui.umd.js"
+    },
+    "./styles": "./dist/style.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "*.css",
+    "*.scss"
+  ],
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^7.2.9 || ^8.0.0",
+    "react-router-dom": "^6.0.0",
+    "redux": "^4.2.1"
+  },
+  "peerDependenciesMeta": {
+    "react": { "optional": false },
+    "react-dom": { "optional": false },
+    "react-redux": { "optional": false },
+    "react-router-dom": { "optional": false },
+    "redux": { "optional": false }
+  },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.5",
     "@module-federation/vite": "^1.2.6",
@@ -58,6 +87,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
+    "build:lib": "vite build --mode library",
     "preview:federation": "cross-env PREVIEW_MODE=true dotenv -e .env.development.mf -- vite build && node scripts/previewLocalBuildMF.mjs",
     "lint": "eslint .",
     "preview": "vite preview",

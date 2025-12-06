@@ -11,10 +11,11 @@ import { dependencies } from './package.json'
 
 export default defineConfig(async ({ mode }) => {
   const env = loadEnv(mode, path.resolve(process.cwd()), '')
+  const isLibraryBuild = mode === 'library'
   const mlrunProxyConfig = await loadMlrunProxyConfig(mode)
 
   const federationPlugin =
-    env.VITE_FEDERATION === 'true'
+    env.VITE_FEDERATION === 'true' && !isLibraryBuild
       ? federation({
           filename: 'remoteEntry.js',
           name: 'mlrun',
@@ -28,6 +29,46 @@ export default defineConfig(async ({ mode }) => {
           }
         })
       : null
+
+  // Library build configuration
+  const libraryBuildConfig = {
+    lib: {
+      entry: path.resolve(__dirname, 'src/main.jsx'),
+      name: 'MlrunUI',
+      fileName: format => `mlrun-ui.${format}`,
+      formats: ['es', 'umd']
+    },
+    rollupOptions: {
+      external: [
+        'react',
+        'react-dom',
+        'react-redux',
+        'react-router-dom',
+        'redux'
+      ],
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+          'react-redux': 'ReactRedux',
+          'react-router-dom': 'ReactRouterDOM',
+          redux: 'Redux'
+        }
+      }
+    },
+    target: 'esnext',
+    sourcemap: true,
+    outDir: 'dist',
+    cssCodeSplit: false
+  }
+
+  // App build configuration (existing)
+  const appBuildConfig = {
+    target: 'esnext',
+    sourcemap: true,
+    outDir: 'build',
+    chunkSizeWarningLimit: 3000
+  }
 
   return {
     plugins: [commonjs(), react(), federationPlugin, svgr(), eslint({ failOnError: false })],
@@ -68,12 +109,7 @@ export default defineConfig(async ({ mode }) => {
     optimizeDeps: {
       force: true
     },
-    build: {
-      target: 'esnext',
-      sourcemap: true,
-      outDir: 'build',
-      chunkSizeWarningLimit: 3000
-    },
+    build: isLibraryBuild ? libraryBuildConfig : appBuildConfig,
     css: {
       devSourcemap: true,
       preprocessorOptions: {
